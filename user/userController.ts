@@ -23,6 +23,9 @@ if(alreadyExists){
 }
 
 
+res.status(201).json({msg:'User created successfully',success:true});
+
+
 
 }
 
