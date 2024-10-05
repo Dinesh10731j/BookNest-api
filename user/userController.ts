@@ -2,6 +2,8 @@ import express from "express";
 import createHttpError from "http-errors";
 import userModel from "./userModel";
 import bcrypt from "bcrypt";
+import {sign} from "jsonwebtoken";
+import { confi } from "../config/config";
 
 const createUser = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
     const { name, email, password } = req.body;
@@ -25,8 +27,14 @@ const createUser = async (req: express.Request, res: express.Response, next: exp
     // Create the new user with the hashed password
     const newUser = await userModel.create({ name, email, password: hashPassword });
 
+
+//creating jwt token
+
+const token = sign({userId:newUser._id},confi.JWT_SECRET as string,{expiresIn:'1h'});
+res.json({accessToken:token})
+
     // Respond with success message
-    res.status(201).json({ msg: 'User created successfully', success: true, id: newUser._id });
+    ///res.status(201).json({ msg: 'User created successfully', success: true, id: newUser._id });
 };
 
 export default createUser;
