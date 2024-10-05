@@ -2,8 +2,9 @@ import express from "express";
 import createHttpError from "http-errors";
 import userModel from "./userModel";
 import bcrypt from "bcrypt";
-import {sign} from "jsonwebtoken";
+import { sign } from "jsonwebtoken";
 import { confi } from "../config/config";
+import { User } from "./userType";
 
 const createUser = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
     const { name, email, password } = req.body;
@@ -14,27 +15,37 @@ const createUser = async (req: express.Request, res: express.Response, next: exp
         return next(error);
     }
 
-    // Check if user already exists
-    const alreadyExists = await userModel.findOne({ email });
-    if (alreadyExists) {
-        const error = createHttpError(400, 'User Already exists');
-        return next(error);
+    try {
+        const alreadyExists = await userModel.findOne({ email });
+        if (alreadyExists) {
+            const error = createHttpError(400, 'User already exists');
+            return next(error);
+        }
+    } catch {
+        return next(createHttpError(500, 'Internal server error'));
     }
 
     // Hash the password
     const hashPassword = await bcrypt.hash(password, 10);
+    
+    let newUser: User;
 
-    // Create the new user with the hashed password
-    const newUser = await userModel.create({ name, email, password: hashPassword });
+    try {
+        newUser = await userModel.create({ name, email, password: hashPassword });
+    } catch {
+        return next(createHttpError(500, 'Error creating user')); // Handle user creation error
+    }
 
-
-//creating jwt token
-
-const token = sign({userId:newUser._id},confi.JWT_SECRET as string,{expiresIn:'1h'});
-res.json({accessToken:token})
+    // Creating JWT token
+    const token = sign({ userId: newUser._id }, confi.JWT_SECRET as string, { expiresIn: '1h' });
 
     // Respond with success message
-    ///res.status(201).json({ msg: 'User created successfully', success: true, id: newUser._id });
+    res.status(201).json({
+        accessToken: token,
+        msg: 'User created successfully',
+        success: true,
+        id: newUser._id
+    });
 };
 
 export default createUser;
