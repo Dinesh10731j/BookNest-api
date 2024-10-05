@@ -6,6 +6,7 @@ import { confi } from "./config/config";
 import connectDB from "./config/db"
 import createHttpError from "http-errors";
 import userRoute from "./user/userRoute";
+import bookRouter from "./book/bookRoute";
 const app = express();
 
 app.get("/",(req:express.Request,res:express.Response,next:NextFunction)=>{
@@ -22,6 +23,7 @@ app.use(morgan("dev"));
 app.use(express.json());
 app.use(globalMiddleware);
 app.use('/api/user',userRoute);
+app.use('/api/books',bookRouter);
 
 const startServer = async () => {
   await connectDB();
