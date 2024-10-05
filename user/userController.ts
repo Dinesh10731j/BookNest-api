@@ -1,33 +1,32 @@
-
-import express from "express"
+import express from "express";
 import createHttpError from "http-errors";
 import userModel from "./userModel";
-const createUser = async (req:express.Request,res:express.Response,next:express.NextFunction)=>{
-const {name,email,password} = req.body;
-if(!name || !email || !password){
-    const error = createHttpError(400,'All fields are required');
+import bcrypt from "bcrypt";
 
-    return next(error);
-}
+const createUser = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    const { name, email, password } = req.body;
 
-//checking if userAlready exits or not
+    // Check for required fields
+    if (!name || !email || !password) {
+        const error = createHttpError(400, 'All fields are required');
+        return next(error);
+    }
 
+    // Check if user already exists
+    const alreadyExists = await userModel.findOne({ email });
+    if (alreadyExists) {
+        const error = createHttpError(400, 'User Already exists');
+        return next(error);
+    }
 
-const alreadyExists = await userModel.findOne({email});
+    // Hash the password
+    const hashPassword = await bcrypt.hash(password, 10);
 
-if(alreadyExists){
-    const error = createHttpError(400,'User Already exists');
+    // Create the new user with the hashed password
+    const newUser = await userModel.create({ name, email, password: hashPassword });
 
-
-    next(error);
-}
-
-
-res.status(201).json({msg:'User created successfully',success:true});
-
-
-
-}
-
+    // Respond with success message
+    res.status(201).json({ msg: 'User created successfully', success: true, id: newUser._id });
+};
 
 export default createUser;
