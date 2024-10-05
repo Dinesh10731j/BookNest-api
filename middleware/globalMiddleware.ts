@@ -10,7 +10,7 @@ const globalMiddleware = (error: HttpError, req: express.Request, res: express.R
  
   res.status(statusCode).json({
     message: error.message,
-    errorStack: confi.NODE_ENV === 'development' ? error : {}
+    errorStack: confi.NODE_ENV === 'development' ? error.stack : {}
   });
   next();
 };
