@@ -41,7 +41,7 @@ const createUser = async (
   }
 
   // Creating JWT token
-  const token = sign({ userId: newUser._id }, confi.JWT_SECRET as string, {
+  const token = sign({ userId:newUser._id }, confi.JWT_SECRET as string, {
     expiresIn: "1h",
   });
 

@@ -2,7 +2,7 @@ import express from "express";
 import { createBook } from "./bookController";
 import multer from "multer";
 import path from "path";
-import authenticate from "../middleware/authenticate";
+import authenticate from "../middlewares/authenticate";
 const bookRouter = express.Router();
 const upload = multer({
   dest: path.resolve(__dirname, "../public/data/uploads"),

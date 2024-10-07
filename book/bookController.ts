@@ -4,7 +4,7 @@ import path from "path";
 import createHttpError from "http-errors";
 import bookModel from "./bookModel";
 import fs from 'fs'
-import { AuthRequest } from "../middleware/authenticate";
+import { AuthRequest } from "../middlewares/authenticate";
 
 const createBook = async (req: Request, res: Response, next: NextFunction) => {
     const files = req.files as { [fieldname: string]: Express.Multer.File[] };
@@ -63,10 +63,11 @@ const createBook = async (req: Request, res: Response, next: NextFunction) => {
             coverImage:uploadResult?.secure_url,
             file: bookFileUploadResult?.secure_url
         });
-        res.status(201).json(newBook);
-
         await fs.promises.unlink(bookFilePath);
         await fs.promises.unlink(filePath);
+        res.status(201).json(newBook);
+
+      
     } catch (err) {
         console.error('Error creating book in database:', err);
         return next(createHttpError(500, 'Error saving book to database.'));
