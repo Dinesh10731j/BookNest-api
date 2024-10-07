@@ -3,6 +3,8 @@ import cloudinary from "../config/cloudinary";
 import path from "path";
 import createHttpError from "http-errors";
 import bookModel from "./bookModel";
+import fs from 'fs'
+import { AuthRequest } from "../middleware/authenticate";
 
 const createBook = async (req: Request, res: Response, next: NextFunction) => {
     const files = req.files as { [fieldname: string]: Express.Multer.File[] };
@@ -39,26 +41,32 @@ const createBook = async (req: Request, res: Response, next: NextFunction) => {
             folder: 'book-pdfs',
             format: 'pdf',
         });
+       
+       
     } catch (err) {
         console.error('Error uploading book file:', err);
         return next(createHttpError(500, 'Error while uploading book file.'));
     }
 
 
-    const { title, genre } = req.body; 
+    const { title, genre} = req.body; 
     if (!title || !genre) {
         return next(createHttpError(400, 'Title and genre are required.'));
     }
 
     try {
+        const _req = req as AuthRequest
         const newBook = await bookModel.create({
             title,
             genre,
-            author: 'w6837687676243445', 
+            author:_req.userId, 
             coverImage:uploadResult?.secure_url,
             file: bookFileUploadResult?.secure_url
         });
         res.status(201).json(newBook);
+
+        await fs.promises.unlink(bookFilePath);
+        await fs.promises.unlink(filePath);
     } catch (err) {
         console.error('Error creating book in database:', err);
         return next(createHttpError(500, 'Error saving book to database.'));
