@@ -1,7 +1,7 @@
 import express, { NextFunction } from "express";
 import cors from "cors";
 import morgan from "morgan";
-import globalMiddleware from "./middleware/globalMiddleware";
+import globalMiddleware from "./middlewares/globalMiddleware";
 import { confi } from "./config/config";
 import connectDB from "./config/db"
 import createHttpError from "http-errors";
