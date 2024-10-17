@@ -13,7 +13,7 @@ const createBook = async (req: Request, res: Response, next: NextFunction) => {
     return next(
       createHttpError(400, "Cover image and book file are required.")
     );
-  }
+  };
 
   const coverImageMimeType = files.coverImage[0].mimetype.split("/").at(-1);
   const fileName = files.coverImage[0].filename;
