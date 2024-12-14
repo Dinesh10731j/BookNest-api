@@ -1,12 +1,12 @@
 import express, { NextFunction } from "express";
 import cors from "cors";
 import morgan from "morgan";
-import globalMiddleware from "./src/middlewares/globalMiddleware";
-import { confi } from "./src/config/config";
-import connectDB from "./src/config/db"
+import globalMiddleware from "./middlewares/globalMiddleware";
+import { confi } from "./config/config";
+import connectDB from "./config/db"
 import createHttpError from "http-errors";
-import userRoute from "./src/user/userRoute";
-import bookRouter from "./src/book/bookRoute";
+import userRoute from "./user/userRoute";
+import bookRouter from "./book/bookRoute";
 const app = express();
 
 app.get("/",(req:express.Request,res:express.Response,next:NextFunction)=>{
