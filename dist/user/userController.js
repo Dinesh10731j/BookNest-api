@@ -15,7 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.userLogin = exports.createUser = void 0;
 const http_errors_1 = __importDefault(require("http-errors"));
 const userModel_1 = __importDefault(require("./userModel"));
-const bcrypt_1 = __importDefault(require("bcrypt"));
+const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const jsonwebtoken_1 = require("jsonwebtoken");
 const config_1 = require("../config/config");
 const createUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
@@ -36,7 +36,7 @@ const createUser = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
         return next((0, http_errors_1.default)(500, "Internal server error"));
     }
     // Hash the password
-    const hashPassword = yield bcrypt_1.default.hash(password, 10);
+    const hashPassword = yield bcryptjs_1.default.hash(password, 10);
     let newUser;
     try {
         newUser = yield userModel_1.default.create({ name, email, password: hashPassword });
@@ -67,7 +67,7 @@ const userLogin = (req, res, next) => __awaiter(void 0, void 0, void 0, function
         if (!user) {
             return next((0, http_errors_1.default)(404, "User not found"));
         }
-        const isMatched = yield bcrypt_1.default.compare(password, user === null || user === void 0 ? void 0 : user.password);
+        const isMatched = yield bcryptjs_1.default.compare(password, user === null || user === void 0 ? void 0 : user.password);
         if (!isMatched) {
             return next((0, http_errors_1.default)(400, "Username or password is incorrect"));
         }
